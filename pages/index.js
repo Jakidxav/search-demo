@@ -1,0 +1,152 @@
+import { useState, useEffect, useRef } from 'react'
+import { Box, useThemeUI } from 'theme-ui'
+import mapboxgl from 'mapbox-gl'
+import { Dimmer } from '@carbonplan/components'
+import { useThemedColormap } from '@carbonplan/colormaps'
+
+import { Map, Raster, Fill, Line } from '@carbonplan/maps'
+import Point from '../components/point'
+import ParameterControls from '../components/parameter-controls'
+import style from './style'
+
+const bucket = 'https://carbonplan-maps.s3.us-west-2.amazonaws.com/'
+
+const Index = () => {
+  const container = useRef(null)
+  const [map, setMap] = useState(null)
+  const [ready, setReady] = useState(null)
+  const { theme } = useThemeUI()
+  const [clim, setClim] = useState([0.0, 0.5])
+  const [variable, setVariable] = useState("drought")
+  const [colormapName, setColormapName] = useState('warm')
+  const [band, setBand] = useState(1.5)
+
+  const [zoom, setZoom] = useState(1)
+
+  const colormap = (variable == 'lethal_heat_3d') ? useThemedColormap(colormapName, { count: 7 }).slice(0,).reverse() :
+    (variable.startsWith('tavg')) ? useThemedColormap(colormapName).slice(0,).reverse() :
+      (variable.startsWith('tc')) ? useThemedColormap(colormapName).slice(0,).reverse() :
+        (variable == 'slr') || (variable == 'slr_3d') ? useThemedColormap(colormapName).slice(0,).reverse() :
+          useThemedColormap(colormapName)
+
+  const [showRegionPicker, setShowRegionPicker] = useState(false)
+  const [regionData, setRegionData] = useState({ loading: true })
+
+  // const glyphs = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
+  // const glyphs = 'https://storage.googleapis.com/carbonplan-data/tiles/glyphs/{fontstack}/{range}.pbf'
+  const glyphs = "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf"
+
+  // useEffect(() => {
+  //   console.log("Zoom: ", zoom)
+  // }, [zoom])
+
+  useEffect(() => {
+    // console.log("Container: ", container.current)
+    if (!container.current) return
+    const mapContainer = new mapboxgl.Map({
+      container: container.current,
+      style: style(theme),
+      attributionControl: false,
+      zoom: 4,
+    })
+    // console.log("Map: ", mapContainer)
+    container.current = mapContainer
+
+    //container.current.on('load', () => {
+    map.on('load', () => {
+      setReady(true)
+      // setMap(map)
+      // console.log(map)
+      // console.log(style)
+    })
+
+    // return () => {
+    return function cleanup() {
+      container.current = null
+      setReady(null)
+      // setMap(null)
+      mapContainer.remove()
+    }
+  }, [])
+
+  // const handleSearch = () => {
+  //   console.log(map)
+  // }
+
+  const getters = {
+    clim,
+    variable,
+    band,
+    colormapName,
+  }
+
+  const setters = {
+    setClim,
+    setVariable,
+    setBand,
+    setColormapName,
+  }
+
+  const handleEnter = () => {
+    console.log(map)
+  }
+
+  return (
+    <Box sx={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} >
+      {/* <Map style={{ width: '100%', height: '100%',}} ref={container} zoom={zoom} > */}
+      <Map style={{ width: '100%', height: '100%',}} ref={container} zoom={zoom} glyphs={glyphs} >
+        <Line
+          id={'land-outline'}
+          color={theme.rawColors.primary}
+          source={bucket + 'basemaps/land'}
+          variable={'land'}
+        />
+
+        <Fill
+          id='land-fill'
+          color={theme.rawColors.primary}
+          source={bucket + 'basemaps/land'}
+          variable={'land'}
+          opacity={0.0}
+          onMouseEnter={handleEnter}
+        /> 
+
+        <Point
+          id={'populated-places'}
+          color={theme.rawColors.primary}
+          // source={'https://storage.googleapis.com/risk-maps/search/pop_places.geojson'}
+          source={'https://storage.googleapis.com/risk-maps/search/pop_places'}
+          variable={'pop_places'}
+          label={true}
+          labelText={'NAMEASCII'}
+        />
+
+          <Raster
+            id='raster'
+            key={variable}
+            colormap={colormap}
+            clim={clim}
+            mode={(variable == 'lethal_heat_3d') ? 'grid' : 'texture'} // 'texture', 'grid', 'dotgrid'            
+            source={`https://storage.googleapis.com/risk-maps/zarr_layers/${variable}.zarr`}
+            variable={variable}
+            selector={{ band }}
+            regionOptions={{ setData: setRegionData }}
+          />
+
+        <ParameterControls getters={getters} setters={setters} />
+
+        <Dimmer
+          sx={{
+            display: ['initial', 'initial', 'initial', 'initial'],
+            position: 'absolute',
+            color: 'primary',
+            right: [13],
+            bottom: [17, 17, 15, 15],
+          }}
+        />
+      </Map>
+    </Box>
+  )
+}
+
+export default Index
