@@ -4,12 +4,14 @@
 import { useEffect, useState } from 'react'
 import { Box, Text, useThemeUI } from 'theme-ui'
 import { useMapbox } from '@carbonplan/maps'
+import * as turf from '@turf/turf'
 
 const SearchResults = ({ 
     results, setResults, 
     searchText, setSearchText, 
     lookup, setLookup, 
-    coordinates, setCoordinates 
+    coordinates, setCoordinates,
+    bbox, setBbox
 }) => {
 
     const { theme } = useThemeUI()
@@ -58,14 +60,21 @@ const SearchResults = ({
 
     useEffect(() => {
         if (place && lookup) {
-            console.log(place)
-            console.log(lookup)
+            console.log(place, lookup)
             fetch(`https://storage.googleapis.com/risk-maps/search/${lookup}.geojson`)
             .then((response) => response.json())
             .then((json) => {
                 let filtered = json.features.filter(feature => feature.properties.NAME == searchText)[0];
-                let coords = filtered.geometry.coordinates
-                setCoordinates(coords)
+                if (filtered.geometry.type == 'Point') {
+                    let coords = filtered.geometry.coordinates
+                    console.log(coords)
+                    setCoordinates(coords)
+                } else {
+                    // currently there are only two other options: Polygon and MultiPolygon
+                    // in the future, there could be MultiLineString options, too, but
+                    // the turf.bbox() method should work for all three
+                    setBbox(turf.bbox(filtered))
+                }
             })
         }
     }, [place, lookup])
@@ -78,6 +87,14 @@ const SearchResults = ({
             })
         }
     }, [coordinates])
+
+    useEffect(() => {
+        if (bbox) {
+            map.fitBounds(bbox)
+            console.log(map.getZoom())
+        }
+    }, [bbox])
+
 
     return (
         <Box>

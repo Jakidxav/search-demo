@@ -6,6 +6,8 @@ import { useThemedColormap } from '@carbonplan/colormaps'
 
 import { Map, Raster, Fill, Line } from '@carbonplan/maps'
 import Point from '../components/point'
+import LineMinZoom from '../components/line-min-zoom'
+import FillMinZoom from '../components/fill-min-zoom'
 import ParameterControls from '../components/parameter-controls'
 import style from './style'
 
@@ -94,7 +96,7 @@ const Index = () => {
   return (
     <Box sx={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} >
       {/* <Map style={{ width: '100%', height: '100%',}} ref={container} zoom={zoom} > */}
-      <Map style={{ width: '100%', height: '100%',}} ref={container} zoom={zoom} glyphs={glyphs} >
+      <Map style={{ width: '100%', height: '100%', }} ref={container} zoom={zoom} glyphs={glyphs} >
         <Line
           id={'land-outline'}
           color={theme.rawColors.primary}
@@ -109,7 +111,40 @@ const Index = () => {
           variable={'land'}
           opacity={0.0}
           onMouseEnter={handleEnter}
-        /> 
+        />
+
+        <LineMinZoom
+          id={'lakes-outline'}
+          color={theme.rawColors.primary}
+          source={'https://storage.googleapis.com/risk-maps/search/lakes'}
+          variable={'lakes'}
+          minZoom={4}
+          width={1.5}
+          label={true}
+          labelText={'NAME'}
+        />
+
+        <FillMinZoom
+          id={'lakes-fill'}
+          color={theme.rawColors.background}
+          source={'https://storage.googleapis.com/risk-maps/search/lakes'}
+          variable={'lakes'}
+          minZoom={4}
+          width={1.5}
+          label={true}
+          labelText={'NAME'}
+        />
+
+        <LineMinZoom
+          id={'states'}
+          color={theme.rawColors.primary}
+          source={'https://storage.googleapis.com/risk-maps/search/states'}
+          variable={'states'}
+          minZoom={4}
+          width={1.5}
+          label={true}
+          labelText={'NAME'}
+        />  
 
         <Point
           id={'populated-places'}
@@ -121,17 +156,26 @@ const Index = () => {
           labelText={'NAMEASCII'}
         />
 
-          <Raster
-            id='raster'
-            key={variable}
-            colormap={colormap}
-            clim={clim}
-            mode={(variable == 'lethal_heat_3d') ? 'grid' : 'texture'} // 'texture', 'grid', 'dotgrid'            
-            source={`https://storage.googleapis.com/risk-maps/zarr_layers/${variable}.zarr`}
-            variable={variable}
-            selector={{ band }}
-            regionOptions={{ setData: setRegionData }}
-          />
+        <Point
+          id={'airports'}
+          color={theme.rawColors.primary}
+          source={'https://storage.googleapis.com/risk-maps/search/airports'}
+          variable={'airports'}
+          label={true}
+          labelText={'NAME'}
+        />
+
+        <Raster
+          id='raster'
+          key={variable}
+          colormap={colormap}
+          clim={clim}
+          mode={(variable == 'lethal_heat_3d') ? 'grid' : 'texture'} // 'texture', 'grid', 'dotgrid'            
+          source={`https://storage.googleapis.com/risk-maps/zarr_layers/${variable}.zarr`}
+          variable={variable}
+          selector={{ band }}
+          regionOptions={{ setData: setRegionData }}
+        />
 
         <ParameterControls getters={getters} setters={setters} />
 

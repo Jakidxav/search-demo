@@ -1,12 +1,10 @@
 // Adapted from Carbonplan's <Input /> component:
 // https://github.com/carbonplan/components/blob/main/src/input.js
-
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 import { Box, Input, Select, Text, useThemeUI } from 'theme-ui'
-import { Badge, Button} from '@carbonplan/components'
-// import { searchArray } from './search-array'
+import { Badge, Button } from '@carbonplan/components'
+import { useMapbox } from '@carbonplan/maps'
 import { searchArray } from './places'
-// import { searchArray } from './places_old'
 import SearchResults from './search-results'
 
 const SearchBox = () => {
@@ -18,9 +16,12 @@ const SearchBox = () => {
   const [coordinates, setCoordinates] = useState(null)
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
+  const [bbox, setBbox] = useState(null)
   const [searchBy, setSearchBy] = useState('place') // 'place' or 'coords'
   const [validLatitude, setValidLatitude] = useState(true)
   const [validLongitude, setValidLongitude] = useState(true)
+
+  const { map } = useMapbox()
 
   const sx = {
     'search-by-place': {
@@ -141,16 +142,17 @@ const SearchBox = () => {
       pb: ['26px'],
       mt: [1],
       float: 'right',
-        '&:hover': {
-          color: 'primary',
-          borderColor: 'primary',
-        },
+      '&:hover': {
+        color: 'primary',
+        borderColor: 'primary',
+      },
     },
     'warning-box': {
       border: '2px solid',
       borderColor: 'red',
-      my: [1], 
-      p: [1], 
+      borderRadius: '5px',
+      my: [1],
+      p: [1],
       bg: theme.colors.background,
     }
   }
@@ -194,6 +196,36 @@ const SearchBox = () => {
     setLongitude(event.target.value)
   }
 
+  const handleValidateCoordinates = () => {
+    let lat = Number(latitude)
+    if (latitude == '' || isNaN(lat) || lat < -90.0 || lat > 90.0) {
+      setValidLatitude(false)
+    } else {
+      setValidLatitude(true)
+    }
+
+    let lon = Number(longitude)
+    if (longitude == '' || isNaN(lon) || lon < -180.0 || lon > 180.0) {
+      setValidLongitude(false)
+    } else {
+      setValidLongitude(true)
+    }
+
+    if (!isNaN(lon) && longitude != '' && !isNaN(lat) && latitude != '') {
+      console.log(lat, lon)
+      setCoordinates([lon, lat])
+    }
+  }
+
+  useEffect(() => {
+    if (coordinates) {
+      map.flyTo({
+        center: coordinates,
+        zoom: 7.5,
+      })
+    }
+  }, coordinates)
+
   return (
     <>
       <Box sx={{ width: '300px' }}>
@@ -225,6 +257,8 @@ const SearchBox = () => {
               setLookup={setLookup}
               coordinates={coordinates}
               setCoordinates={setCoordinates}
+              bbox={bbox}
+              setBbox={setBbox}
             />
           </>
         )}
@@ -243,11 +277,11 @@ const SearchBox = () => {
             />
             {!validLatitude && (
               <Box sx={sx['warning-box']}>
-                <Text sx={{color: 'red'}}>Please enter a numeric value between [-90, 90].</Text>
+                <Text sx={{ color: 'red' }}>Please enter a numeric value between [-90, 90].</Text>
               </Box>
             )}
 
-            <Badge id={'lon-badge'} sx={{...sx['latlon-badge'], ...sx['lon-badge']}}>
+            <Badge id={'lon-badge'} sx={{ ...sx['latlon-badge'], ...sx['lon-badge'] }}>
               {'Lon: '}
             </Badge>
             <Input
@@ -260,11 +294,11 @@ const SearchBox = () => {
 
             {!validLongitude && (
               <Box sx={sx['warning-box']}>
-                <Text sx={{color: 'red'}}>Please enter a numeric value between [-180, 180].</Text>
+                <Text sx={{ color: 'red' }}>Please enter a numeric value between [-180, 180].</Text>
               </Box>
             )}
 
-            <Button sx={sx['latlon-button']}>Search</Button>
+            <Button sx={sx['latlon-button']} onClick={handleValidateCoordinates}>Search</Button>
           </Box>
         )}
       </Box>
