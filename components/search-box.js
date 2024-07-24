@@ -6,6 +6,7 @@ import { Badge, Button } from '@carbonplan/components'
 import { useMapbox } from '@carbonplan/maps'
 import { searchArray } from './places'
 import SearchResults from './search-results'
+import SearchResultsMapbox from './search-results-mapbox'
 
 const SearchBox = () => {
   const { theme } = useThemeUI()
@@ -14,12 +15,18 @@ const SearchBox = () => {
   const [searchText, setSearchText] = useState(null)
   const [lookup, setLookup] = useState(null)
   const [coordinates, setCoordinates] = useState(null)
+  const [latitudeInput, setLatitudeInput] = useState('')
+  const [longitudeInput, setLongitudeInput] = useState('')
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
   const [bbox, setBbox] = useState(null)
   const [searchBy, setSearchBy] = useState('place') // 'place' or 'coords'
   const [validLatitude, setValidLatitude] = useState(true)
   const [validLongitude, setValidLongitude] = useState(true)
+
+  const [resultsMapbox, setResultsMapbox] = useState([])
+  const [searchTextMapbox, setSearchTextMapbox] = useState(null)
+  const MAPBOX_TOKEN = ''
 
   const { map } = useMapbox()
 
@@ -188,34 +195,66 @@ const SearchBox = () => {
     // setResults(tempResults)
   }
 
+  const handleSearchMapbox = (event) => {
+    const limit = 5;
+    let query = event.target.value
+    setSearchTextMapbox(query)
+
+    if (query == "") {
+      setResultsMapbox([])
+      return
+    }
+
+    // console.log("Query: ", query)
+    // console.log("Search text: ", searchTextMapbox)
+    
+    fetch(`https://api.mapbox.com/search/geocode/v6/forward?q=${query}&access_token=${MAPBOX_TOKEN}`)
+      .then((response) => response.json())
+      .then((json) => {
+        if (json.features.length == 0) {
+          console.log("Empty results")
+        } else {
+          setResultsMapbox(json.features)
+        }
+    })
+  }
+
+  useEffect(() => {
+    resultsMapbox.forEach(result => {
+      console.log(result.properties.full_address, result.properties.feature_type)
+    })
+    console.log()
+  }, [resultsMapbox])
+
   const handleLatSearch = (event) => {
-    setLatitude(event.target.value)
+    setLatitudeInput(event.target.value)
   }
 
   const handleLonSearch = (event) => {
-    setLongitude(event.target.value)
+    setLongitudeInput(event.target.value)
   }
 
   const handleValidateCoordinates = () => {
-    let lat = Number(latitude)
-    if (latitude == '' || isNaN(lat) || lat < -90.0 || lat > 90.0) {
+    let lat = Number(latitudeInput)
+    if (latitudeInput == '' || isNaN(lat) || lat < -90.0 || lat > 90.0) {
       setValidLatitude(false)
     } else {
       setValidLatitude(true)
+      setLatitude(latitudeInput)
     }
 
-    let lon = Number(longitude)
-    if (longitude == '' || isNaN(lon) || lon < -180.0 || lon > 180.0) {
+    let lon = Number(longitudeInput)
+    if (longitudeInput == '' || isNaN(lon) || lon < -180.0 || lon > 180.0) {
       setValidLongitude(false)
     } else {
       setValidLongitude(true)
-    }
-
-    if (!isNaN(lon) && longitude != '' && !isNaN(lat) && latitude != '') {
-      console.log(lat, lon)
-      setCoordinates([lon, lat])
+      setLongitude(longitudeInput)
     }
   }
+
+  useEffect(() => {
+    setCoordinates([longitude, latitude])
+  }, [latitude, longitude])
 
   useEffect(() => {
     if (coordinates) {
@@ -226,6 +265,20 @@ const SearchBox = () => {
     }
   }, coordinates)
 
+  const handleSearchBy = (event) => {
+    if (event.target.value == 'mapbox') {
+      setSearchText("")
+      setCoordinates(null)
+    } else if (event.target.value == 'place') {
+      setSearchTextMapbox("")
+      setCoordinates(null)
+    } else {
+      setSearchText("")
+      setSearchTextMapbox("")
+    }
+    setSearchBy(event.target.value)
+  }
+
   return (
     <>
       <Box sx={{ width: '300px' }}>
@@ -233,10 +286,13 @@ const SearchBox = () => {
           size='xs'
           sx={{ width: '50%' }}
           value={searchBy}
-          onChange={(event) => setSearchBy(event.target.value)}
+          onChange={handleSearchBy}
         >
           <option value='place'>Place</option>
           <option value='coords'>Coordinates</option>
+          <option value='mapbox'>Mapbox</option>
+          {/* <option value='pelias'>Pelias</option> */}
+
         </Select>
 
         {searchBy == 'place' && (
@@ -263,6 +319,27 @@ const SearchBox = () => {
           </>
         )}
 
+        {searchBy == 'mapbox' && (
+          <>
+            <Input
+              placeholder='Search for place'
+              sx={sx['search-by-place']}
+              onChange={handleSearchMapbox}
+              value={searchTextMapbox}
+            />
+
+            <SearchResultsMapbox 
+              results={resultsMapbox}
+              coordinates={coordinates}
+              setCoordinates={setCoordinates}
+              bbox={bbox}
+              setBbox={setBbox}
+              setResultsMapbox={setResultsMapbox}
+              setSearchTextMapbox={setSearchTextMapbox}
+            />
+          </>
+        )}
+
         {searchBy == 'coords' && (
           <Box sx={sx['search-by-latlon-container']}>
             <Badge id={'lat-badge'} sx={sx['latlon-badge']}>
@@ -273,7 +350,7 @@ const SearchBox = () => {
               placeholder='[-90, 90]'
               sx={sx['search-by-latlon']}
               onChange={handleLatSearch}
-              value={latitude}
+              value={latitudeInput}
             />
             {!validLatitude && (
               <Box sx={sx['warning-box']}>
@@ -289,7 +366,7 @@ const SearchBox = () => {
               placeholder='[-180, 180]'
               sx={sx['search-by-latlon']}
               onChange={handleLonSearch}
-              value={longitude}
+              value={longitudeInput}
             />
 
             {!validLongitude && (

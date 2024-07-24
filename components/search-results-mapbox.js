@@ -6,17 +6,18 @@ import { Box, Text, useThemeUI } from 'theme-ui'
 import { useMapbox } from '@carbonplan/maps'
 import * as turf from '@turf/turf'
 
-const SearchResults = ({ 
-    results, setResults, 
-    searchText, setSearchText, 
-    lookup, setLookup, 
-    coordinates, setCoordinates,
-    bbox, setBbox
+const SearchResultsMapbox = ({
+    results,
+    coordinates,
+    setCoordinates,
+    bbox,
+    setBbox,
+    setResultsMapbox,
+    setSearchTextMapbox,
 }) => {
 
     const { theme } = useThemeUI()
     const [place, setPlace] = useState(null)
-
     console.log(results)
 
     const sx = {
@@ -49,35 +50,20 @@ const SearchResults = ({
 
     const { map } = useMapbox()
 
-    const handleResultClick = ((event) => {
+    const handleResultClick = ((event, index) => {
+        let selected = results[index]
         let place = event.target.innerText
-        console.log(place)
-        setSearchText(place)
+        setSearchTextMapbox(place)
         setPlace(place)
-        setLookup(results.filter(result => result[0] == place)[0][1])
-        setResults([])
-    })
+        setResultsMapbox([])
 
-    useEffect(() => {
-        if (place && lookup) {
-            console.log(place, lookup)
-            fetch(`https://storage.googleapis.com/risk-maps/search/${lookup}.geojson`)
-            .then((response) => response.json())
-            .then((json) => {
-                let filtered = json.features.filter(feature => feature.properties.NAME == searchText)[0];
-                if (filtered.geometry.type == 'Point') {
-                    let coords = filtered.geometry.coordinates
-                    console.log(coords)
-                    setCoordinates(coords)
-                } else {
-                    // currently there are only two other options: Polygon and MultiPolygon
-                    // in the future, there could be MultiLineString options, too, but
-                    // the turf.bbox() method should work for all three
-                    setBbox(turf.bbox(filtered))
-                }
-            })
+        let featureType = selected.properties.feature_type
+        if (featureType == 'place' || featureType == 'address') {
+            setCoordinates(selected.geometry.coordinates)
+        } else {
+            setBbox(selected.properties.bbox)
         }
-    }, [place, lookup])
+    })
 
     useEffect(() => {
         if (coordinates) {
@@ -104,8 +90,8 @@ const SearchResults = ({
                 results.map((result, index) => {
                     return (
                         <Box key={index} sx={sx['search-results']} >
-                            <Box onClick={handleResultClick}>
-                                <Text>{result[0]}</Text>
+                            <Box onClick={event => handleResultClick(event, index)}>
+                                <Text>{result.properties.full_address}</Text>
                             </Box>
                             <Box>
                                 <Text sx={{
@@ -113,7 +99,7 @@ const SearchResults = ({
                                     fontSize: [2, 2, 2, 3],
 
                                 }}>
-                                    {result[1]}
+                                    {result.properties.feature_type}
                                 </Text>
                             </Box>
                         </Box>
@@ -124,4 +110,4 @@ const SearchResults = ({
     )
 }
 
-export default SearchResults
+export default SearchResultsMapbox
