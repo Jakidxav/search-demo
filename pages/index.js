@@ -34,16 +34,9 @@ const Index = () => {
   const [showRegionPicker, setShowRegionPicker] = useState(false)
   const [regionData, setRegionData] = useState({ loading: true })
 
-  // const glyphs = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
-  // const glyphs = 'https://storage.googleapis.com/carbonplan-data/tiles/glyphs/{fontstack}/{range}.pbf'
   const glyphs = "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf"
 
-  // useEffect(() => {
-  //   console.log("Zoom: ", zoom)
-  // }, [zoom])
-
   useEffect(() => {
-    // console.log("Container: ", container.current)
     if (!container.current) return
     const mapContainer = new mapboxgl.Map({
       container: container.current,
@@ -51,29 +44,18 @@ const Index = () => {
       attributionControl: false,
       zoom: 4,
     })
-    // console.log("Map: ", mapContainer)
     container.current = mapContainer
 
-    //container.current.on('load', () => {
     map.on('load', () => {
       setReady(true)
-      // setMap(map)
-      // console.log(map)
-      // console.log(style)
     })
 
-    // return () => {
     return function cleanup() {
       container.current = null
       setReady(null)
-      // setMap(null)
       mapContainer.remove()
     }
   }, [])
-
-  // const handleSearch = () => {
-  //   console.log(map)
-  // }
 
   const getters = {
     clim,
@@ -95,7 +77,6 @@ const Index = () => {
 
   return (
     <Box sx={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} >
-      {/* <Map style={{ width: '100%', height: '100%',}} ref={container} zoom={zoom} > */}
       <Map style={{ width: '100%', height: '100%', }} ref={container} zoom={zoom} glyphs={glyphs} >
         <Line
           id={'land-outline'}

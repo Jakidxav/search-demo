@@ -1,9 +1,9 @@
 import { Box } from 'theme-ui'
 import { useCallback, useEffect } from 'react'
 import { Badge, Button, Select, Slider } from '@carbonplan/components'
-import { Reset, Search } from '@carbonplan/icons'
+import { Reset, Search as SearchIcon } from '@carbonplan/icons'
 import { useMapbox } from '@carbonplan/maps'
-import  SearchBox  from './search-box'
+import  Search  from './search'
 
 const sx = {
   label: {
@@ -68,32 +68,6 @@ const ParameterControls = ({ getters, setters }) => {
   } = setters
 
   const { map } = useMapbox()
-  // console.log(map)
-  // console.log(map.style)
-  // console.log(map.getCanvas())
-  // console.log(map.getLayer('d3ecfd93-3cc4-4659-bc88-f0e31c019334'))
-  // console.log(map.current)
-  // const landOutline = map.getLayer(map.getSource('land-outline'))
-  // const landFill = map.getLayer('land-fill')
-  // console.log(landOutline)
-  // console.log(landFill)
-  // console.log(land.style)
-  // console.log(land.map.style)
-
-  // useEffect(() => {
-  //   sourceIdRef.current = id || uuidv4()
-  //   const { current: sourceId } = sourceIdRef
-  //   if (!map.getSource(sourceId)) {
-  //     map.addSource(sourceId, {
-  //       type: 'vector',
-  //       tiles: [`${source}/{z}/{x}/{y}.pbf`],
-  //     })
-  //     if (maxZoom) {
-  //       map.getSource(sourceId).maxzoom = maxZoom
-  //     }
-  //   }
-  // }, [id])
-
 
   const handleVariableChange = useCallback((event) => {
     const variable = event.target.value
@@ -130,19 +104,10 @@ const ParameterControls = ({ getters, setters }) => {
     map.setPaintProperty('land-outline', 'line-color', 'blue')
   }
 
-//   map.on('mouseenter', 'land-outline', (event) => {
-//     // Change the cursor style as a UI indicator.
-//     map.getCanvas().style.cursor = 'pointer';
-// });
-
-//   map.on('mouseleave', 'land-outline', () => {
-//       map.getCanvas().style.cursor = '';
-//   });
-
   return (
     <>
       <Box sx={{ position: 'absolute', top: 40, right: 5 }}>
-        <SearchBox />
+        <Search />
       </Box>
 
       <Box sx={{ position: 'absolute', top: 20, left: 20 }}>
@@ -242,38 +207,6 @@ const ParameterControls = ({ getters, setters }) => {
         >
           {clim[1].toFixed(1)}
         </Badge>
-
-        {/* <Box sx={{ ...sx.label, mt: [4] }}>
-          <Badge>
-            <Button prefix={<Search />} onClick={zoomIn} >
-              Zoom to location
-            </Button>
-          </Badge>
-        </Box>
-
-        <Box sx={{ ...sx.label, mt: [4] }}>
-          <Badge>
-            <Button prefix={<Reset/>} onClick={handleReset} >
-              Reset
-            </Button>
-          </Badge>
-        </Box>
-
-        <Box sx={{ ...sx.label, mt: [4] }}>
-          <Badge>
-            <Button onClick={handleSource} >
-              Get vector info
-            </Button>
-          </Badge>
-        </Box>
-
-        <Box sx={{ ...sx.label, mt: [4] }}>
-          <Badge>
-            <Button onClick={handleColorChange} >
-              Change color
-            </Button>
-          </Badge>
-        </Box> */}
 
       </Box>
     </>

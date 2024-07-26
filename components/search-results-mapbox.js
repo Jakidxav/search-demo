@@ -1,30 +1,25 @@
-// Adapted from Carbonplan's <Input /> component:
-// https://github.com/carbonplan/components/blob/main/src/input.js
-
 import { useEffect, useState } from 'react'
 import { Box, Text, useThemeUI } from 'theme-ui'
 import { useMapbox } from '@carbonplan/maps'
-import * as turf from '@turf/turf'
 
 const SearchResultsMapbox = ({
     results,
-    coordinates,
+    setResults,
+    setSearchText,
     setCoordinates,
-    bbox,
     setBbox,
-    setResultsMapbox,
-    setSearchTextMapbox,
 }) => {
 
     const { theme } = useThemeUI()
+
     const [place, setPlace] = useState(null)
-    console.log(results)
 
     const sx = {
         'search-results': {
             color: 'primary',
             border: '1px solid',
             borderColor: 'primary',
+            borderRadius: '5px',
             bg: theme.colors.background,
             transition: 'border 0.15s',
             fontSize: [3, 3, 3, 4],
@@ -53,9 +48,9 @@ const SearchResultsMapbox = ({
     const handleResultClick = ((event, index) => {
         let selected = results[index]
         let place = event.target.innerText
-        setSearchTextMapbox(place)
+        setSearchText(place)
         setPlace(place)
-        setResultsMapbox([])
+        setResults([])
 
         let featureType = selected.properties.feature_type
         if (featureType == 'place' || featureType == 'address') {
@@ -66,21 +61,11 @@ const SearchResultsMapbox = ({
     })
 
     useEffect(() => {
-        if (coordinates) {
-            map.flyTo({
-                center: coordinates,
-                zoom: 7.5,
-            })
-        }
-    }, [coordinates])
-
-    useEffect(() => {
-        if (bbox) {
-            map.fitBounds(bbox)
-            console.log(map.getZoom())
-        }
-    }, [bbox])
-
+        results.forEach(result => {
+            console.log(result.properties.full_address, result.properties.feature_type)
+        })
+        console.log()
+    }, [results])
 
     return (
         <Box>

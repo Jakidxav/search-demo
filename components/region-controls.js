@@ -3,8 +3,6 @@ import { useRecenterRegion } from '@carbonplan/maps'
 import { XCircle } from '@carbonplan/icons'
 
 const AverageDisplay = ({ variable, band, data: { value } }) => {
-  // console.log(variable)
-  // console.log(value)
   if (!value || !value[variable]) {
     return 'loading...'
   }
