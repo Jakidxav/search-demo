@@ -65,15 +65,21 @@ const SearchResults = ({
                 .then((response) => response.json())
                 .then((json) => {
                     let filtered = json.features.filter(feature => feature.properties.NAME == searchText)[0];
-                    if (filtered.geometry.type == 'Point') {
+                    if (filtered.geometry != null && filtered.geometry.type == 'Point') {
+                        console.log('point')
                         let coords = filtered.geometry.coordinates
                         console.log(coords)
                         setCoordinates(coords)
                     } else {
+                        console.log("states")
                         // currently there are only two other options: Polygon and MultiPolygon
                         // in the future, there could be MultiLineString options, too, but
                         // the turf.bbox() method should work for all three
-                        setBbox(turf.bbox(filtered))
+                        // let [minLon, minLat, maxLon, maxLat] = filtered.properties.bbox
+                        console.log(filtered)
+                        console.log(filtered.properties.bbox)
+                        setBbox(filtered.properties.bbox)
+                        // setBbox(filtered.properties.bbox)
                     }
                 })
         }
