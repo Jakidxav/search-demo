@@ -56,7 +56,6 @@ const SearchResultsMapbox = ({
         if (featureType == 'place' || featureType == 'address') {
             setCoordinates(selected.geometry.coordinates)
         } else {
-            console.log(selected.properties.bbox)
             setBbox(selected.properties.bbox)
         }
     })

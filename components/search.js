@@ -18,7 +18,7 @@ const Search = () => {
   const [searchTextMapbox, setSearchTextMapbox] = useState(null)
   const [coordinates, setCoordinates] = useState(null)
   const [bbox, setBbox] = useState(null)
-  const [searchBy, setSearchBy] = useState('place') // 'place' or 'coords'
+  const [searchBy, setSearchBy] = useState('place') // 'place', 'coords', 'mapbox'
 
   const MAPBOX_TOKEN = ''
 
@@ -105,7 +105,7 @@ const Search = () => {
   useEffect(() => {
     if (bbox) {
       map.fitBounds(bbox)
-      console.log(map.getZoom())
+      // console.log('Zoom:', map.getZoom())
     }
   }, [bbox])
 

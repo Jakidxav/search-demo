@@ -4,7 +4,6 @@
 import { useEffect, useState } from 'react'
 import { Box, Text, useThemeUI } from 'theme-ui'
 import { useMapbox } from '@carbonplan/maps'
-import * as turf from '@turf/turf'
 
 const SearchResults = ({
     results,
@@ -66,18 +65,16 @@ const SearchResults = ({
                 .then((json) => {
                     let filtered = json.features.filter(feature => feature.properties.NAME == searchText)[0];
                     if (filtered.geometry != null && filtered.geometry.type == 'Point') {
-                        console.log('point')
                         let coords = filtered.geometry.coordinates
-                        console.log(coords)
+                        // console.log(coords)
                         setCoordinates(coords)
                     } else {
-                        console.log("states")
                         // currently there are only two other options: Polygon and MultiPolygon
                         // in the future, there could be MultiLineString options, too, but
                         // the turf.bbox() method should work for all three
                         // let [minLon, minLat, maxLon, maxLat] = filtered.properties.bbox
-                        console.log(filtered)
-                        console.log(filtered.properties.bbox)
+                        // console.log(filtered)
+                        // console.log(filtered.properties.bbox)
                         setBbox(filtered.properties.bbox)
                         // setBbox(filtered.properties.bbox)
                     }
@@ -102,7 +99,14 @@ const SearchResults = ({
                                     fontSize: [2, 2, 2, 3],
 
                                 }}>
-                                    {result[1]}
+                                    {
+                                        result[1] == 'cities' ? 'city' :
+                                        result[1] == 'counties' ? 'county' :
+                                        result[1] == 'states' ? 'state' :
+                                        result[1] == 'countries' ? 'country' :
+                                        result[1] == 'regions' ? 'region' :
+                                        'lake'
+                                    }
                                 </Text>
                             </Box>
                         </Box>
