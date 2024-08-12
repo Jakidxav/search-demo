@@ -9,7 +9,6 @@ import Point from '../components/point'
 import LineMinZoom from '../components/line-min-zoom'
 import FillMinZoom from '../components/fill-min-zoom'
 import ParameterControls from '../components/parameter-controls'
-import style from './style'
 
 const bucket = 'https://carbonplan-maps.s3.us-west-2.amazonaws.com/'
 
@@ -40,7 +39,6 @@ const Index = () => {
     if (!container.current) return
     const mapContainer = new mapboxgl.Map({
       container: container.current,
-      style: style(theme),
       attributionControl: false,
       zoom: 4,
     })

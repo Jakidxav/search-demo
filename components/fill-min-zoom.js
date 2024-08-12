@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { useMapbox } from '@carbonplan/maps'
-// import { updatePaintProperty } from './utils'
 import { v4 as uuidv4 } from 'uuid'
 
 const updatePaintProperty = (map, ref, key, value) => {
