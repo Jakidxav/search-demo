@@ -1,9 +1,9 @@
-import { Box } from 'theme-ui'
+import { Box, Flex } from 'theme-ui'
 import { useCallback, useEffect } from 'react'
-import { Badge, Button, Select, Slider } from '@carbonplan/components'
+import { Badge, Select, Slider, Toggle } from '@carbonplan/components'
 import { Reset, Search as SearchIcon } from '@carbonplan/icons'
 import { useMapbox } from '@carbonplan/maps'
-import  Search  from './search'
+import Search from './search'
 
 const sx = {
   label: {
@@ -36,7 +36,7 @@ const VARIABLE_BANDS = {
   tc_rp: [2017.0, 2050.0],
   // slr: [''],
   slr_3d: [2050.0],
-  wdd: [1.5, 2.0], 
+  wdd: [1.5, 2.0],
   warm_nights: [1.5, 2.0],
 }
 
@@ -52,11 +52,11 @@ const DEFAULT_COLORMAPS = {
   warm_nights: 'fire',
 }
 
-const ParameterControls = ({ getters, setters }) => {
-  const { 
-    clim, 
-    variable, 
-    band, 
+const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTemp, setShowTemp }) => {
+  const {
+    clim,
+    variable,
+    band,
     colormapName,
   } = getters
 
@@ -104,14 +104,116 @@ const ParameterControls = ({ getters, setters }) => {
     map.setPaintProperty('land-outline', 'line-color', 'blue')
   }
 
+  useEffect(() => {
+    // console.log(map.getStyle().layers)
+    let layerID = map.getStyle().layers.filter(layer => layer.source == 'states')[0]['id']
+    console.log(layerID)
+    // const allFeatures = map.querySourceFeatures("73c5995e-6c92-4e35-9c08-b5ec0f333b07", {
+    //   sourceLayer: 'states',
+    //   // filter: ['in', 'name', 'Ohio']
+    // });
+    // var allFeatures = map.getSource('73c5995e-6c92-4e35-9c08-b5ec0f333b07')._options.data;
+    // console.log("All features?")
+    // console.log(allFeatures)
+
+    // const features = map.queryRenderedFeatures({ layers: [layerID] });
+    // let highlighted
+
+    // const foundTiles = map.querySourceFeatures('states2', {
+    //   sourceLayer: 'states',
+    //   filter: ['in', 'gn_name', 'Ohio']
+    // });
+    // console.log('Found tiles: ')
+    // console.log(foundTiles)
+
+    // if(features) {
+    //   highlighted = features.filter(feature => feature.properties.gn_name.includes("Ohio"))
+    // }
+    // console.log("Features: ")
+    // console.log(features)
+    // console.log("Found features: ")
+    // if(highlighted[0]) {
+    //   console.log(highlighted)
+    //   console.log(highlighted[0].geometry)
+    //   let geoms = highlighted.map(feature => feature.geometry.coordinates[0])
+    //   if(geoms.length > 1) {
+    //     geoms = geoms.map(geom => [...new Set(geom)])
+    //   }
+    //   console.log("Geometries: ")
+    //   console.log(geoms)
+    //   var merged = geoms.flat()
+    //   console.log(merged)
+    // }
+
+  }, [])
+
+  // useEffect(() => {
+  //   setTimeout(function() {
+  //     map.setPaintProperty('temp-outline', 'line-opacity', 0)
+  //   }, 500)
+  //   setTimeout(function() {
+  //     map.setPaintProperty('temp-outline', 'line-opacity', 1);
+  //   }, 1000)
+  //   setTimeout(function() {
+  //     map.setPaintProperty('temp-outline', 'line-opacity', 0)
+  //   }, 1500)
+  //   setTimeout(function() {
+  //     map.setPaintProperty('temp-outline', 'line-opacity', 1);
+  //   }, 2000)
+  //   setTimeout(function() {
+  //     map.setPaintProperty('temp-outline', 'line-opacity', 0)
+  //   }, 2500)
+  //   setTimeout(function() {
+  //     map.setPaintProperty('temp-outline', 'line-opacity', 1);
+  //   }, 3000)
+  // }, [])
+
   return (
     <>
-      <Box sx={{ position: 'absolute', top: 40, right: 5 }}>
+      <Box sx={{ position: 'absolute', top: 20, right: 20 }}>
+        <Flex
+          sx={{
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 4,
+          }}
+        >
+          <Box>
+            <Box sx={{ ...sx.label, mt: [0] }}>Filter layer</Box>
+            <Toggle
+              sx={{ float: 'right', mt: [2] }}
+              value={showFilter}
+              onClick={() => setShowFilter((prev) => !prev)}
+            />
+          </Box>
+        </Flex>
+      </Box>
+
+      <Box sx={{ position: 'absolute', top: 80, right: 20 }}>
+        <Flex
+          sx={{
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 4,
+          }}
+        >
+          <Box>
+            <Box sx={{ ...sx.label, mt: [0] }}>Temp layer</Box>
+            <Toggle
+              sx={{ float: 'right', mt: [2] }}
+              value={showTemp}
+              onClick={() => setShowTemp((prev) => !prev)}
+            />
+          </Box>
+        </Flex>
+      </Box>
+
+      <Box sx={{ position: 'absolute', top: 140, right: 5 }}>
         <Search />
       </Box>
 
       <Box sx={{ position: 'absolute', top: 20, left: 20 }}>
-      <Box sx={{ ...sx.label, mt: [2] }}>Variable</Box>
+        <Box sx={{ ...sx.label, mt: [2] }}>Variable</Box>
         <Select
           sxSelect={{ bg: 'transparent' }}
           size='xs'
@@ -137,14 +239,14 @@ const ParameterControls = ({ getters, setters }) => {
         <Box sx={sx.label}>Warming level / time period</Box>
         {/* {(variable != 'slr') && ( */}
         {(variable != 'slr_3d') && (
-        <Slider
-          min={VARIABLE_BANDS[variable][0]}
-          max={VARIABLE_BANDS[variable][VARIABLE_BANDS[variable].length - 1]}
-          step={(variable == 'tc_rp') ? 33.0 : 0.5}
-          sx={{ width: '175px', display: 'inline-block' }}
-          value={band}
-          onChange={(e) => setBand(parseFloat(e.target.value))}
-        />
+          <Slider
+            min={VARIABLE_BANDS[variable][0]}
+            max={VARIABLE_BANDS[variable][VARIABLE_BANDS[variable].length - 1]}
+            step={(variable == 'tc_rp') ? 33.0 : 0.5}
+            sx={{ width: '175px', display: 'inline-block' }}
+            value={band}
+            onChange={(e) => setBand(parseFloat(e.target.value))}
+          />
         )}
         <Badge
           sx={{
@@ -157,7 +259,7 @@ const ParameterControls = ({ getters, setters }) => {
           }}
         >
           {/* { (variable == 'slr') ? '2050' : (variable == 'tc_rp') ? band : band.toFixed(1) } */}
-          { (variable == 'slr_3d') || (variable == 'tc_rp') ? band.toFixed(0) : band.toFixed(1) }
+          {(variable == 'slr_3d') || (variable == 'tc_rp') ? band.toFixed(0) : band.toFixed(1)}
         </Badge>
 
         <Box sx={sx.label}>Minimum</Box>

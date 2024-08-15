@@ -40,7 +40,7 @@ const SearchResults = ({
                 background: 'none !important',
             },
             '&:hover': {
-                backgroundColor: "#ef4836",
+                backgroundColor: "red",
                 borderColor: 'primary',
             },
         },

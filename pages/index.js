@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { keyframes } from '@emotion/react'
 import { Box, useThemeUI } from 'theme-ui'
 import mapboxgl from 'mapbox-gl'
 import { Dimmer } from '@carbonplan/components'
@@ -8,6 +9,8 @@ import { Map, Raster, Fill, Line } from '@carbonplan/maps'
 import Point from '../components/point'
 import LineMinZoom from '../components/line-min-zoom'
 import FillMinZoom from '../components/fill-min-zoom'
+import FilterLayer from '../components/filter-layer'
+import TempLayer from '../components/temp-layer'
 import ParameterControls from '../components/parameter-controls'
 
 const bucket = 'https://carbonplan-maps.s3.us-west-2.amazonaws.com/'
@@ -32,8 +35,19 @@ const Index = () => {
 
   const [showRegionPicker, setShowRegionPicker] = useState(false)
   const [regionData, setRegionData] = useState({ loading: true })
+  const [showFilter, setShowFilter] = useState(false)
+  const [showTemp, setShowTemp] = useState(false)
 
   const glyphs = "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf"
+
+  const fade = keyframes({
+    from: {
+      opacity: 1,
+    },
+    to: {
+      opacity: 0,
+    },
+  })
 
   useEffect(() => {
     if (!container.current) return
@@ -115,15 +129,56 @@ const Index = () => {
         />
 
         <LineMinZoom
+          // <Line
           id={'states'}
           color={theme.rawColors.primary}
           source={'https://storage.googleapis.com/risk-maps/search/states'}
           variable={'states'}
           minZoom={4}
           width={1.5}
-          label={true}
-          labelText={'NAME'}
-        />  
+        // label={true}
+        // labelText={'NAME'}
+        />
+
+        {/* <Box sx={{
+            width: '300px',
+            height: '300px',
+            border: '2px solid red',
+            position: 'absolute', 
+            top: 40, 
+            right: 5,
+            animationDelay: '0s',
+            animationDuration: '0.5s',
+            animationIterationCount: 4,
+            animationName: fade.toString(),
+            // animationTimingFunction: 'linear',
+            animationFillMode: 'forwards',
+        }}>
+        </Box> */}
+        {showTemp && (
+          <TempLayer
+            id={'temp-layer'}
+            variable={'states'}
+            color={'red'}
+            width={5}
+            opacity={0}
+          />
+        )}
+
+        {showFilter && (
+          <FilterLayer
+            id={'states2'}
+            source={'https://storage.googleapis.com/risk-maps/search/states'}
+            variable={'states'}
+            // minZoom={4}
+            width={4}
+            opacity={0}
+            color={'black'}
+            label={true}
+            labelText={'NAME'}
+            filter={null}
+          />
+        )}
 
         <Point
           id={'populated-places'}
@@ -156,7 +211,14 @@ const Index = () => {
           regionOptions={{ setData: setRegionData }}
         />
 
-        <ParameterControls getters={getters} setters={setters} />
+        <ParameterControls
+          getters={getters}
+          setters={setters}
+          showFilter={showFilter}
+          setShowFilter={setShowFilter}
+          showTemp={showTemp}
+          setShowTemp={setShowTemp}
+        />
 
         <Dimmer
           sx={{
