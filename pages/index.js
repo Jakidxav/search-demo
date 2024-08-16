@@ -129,15 +129,25 @@ const Index = () => {
         />
 
         <LineMinZoom
-          // <Line
           id={'states'}
           color={theme.rawColors.primary}
           source={'https://storage.googleapis.com/risk-maps/search/states'}
           variable={'states'}
           minZoom={4}
           width={1.5}
-        // label={true}
-        // labelText={'NAME'}
+        label={true}
+        labelText={'NAME'}
+        />
+
+      <LineMinZoom
+          id={'counties'}
+          color={theme.rawColors.primary}
+          source={'https://storage.googleapis.com/risk-maps/search/counties'}
+          variable={'counties'}
+          minZoom={4}
+          width={1.5}
+          label={true}
+          labelText={'NAME'}
         />
 
         {/* <Box sx={{

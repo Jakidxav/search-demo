@@ -104,10 +104,10 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
     map.setPaintProperty('land-outline', 'line-color', 'blue')
   }
 
-  useEffect(() => {
+  // useEffect(() => {
     // console.log(map.getStyle().layers)
-    let layerID = map.getStyle().layers.filter(layer => layer.source == 'states')[0]['id']
-    console.log(layerID)
+    // let layerID = map.getStyle().layers.filter(layer => layer.source == 'states')[0]['id']
+    // console.log(layerID)
     // const allFeatures = map.querySourceFeatures("73c5995e-6c92-4e35-9c08-b5ec0f333b07", {
     //   sourceLayer: 'states',
     //   // filter: ['in', 'name', 'Ohio']
@@ -144,8 +144,7 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
     //   var merged = geoms.flat()
     //   console.log(merged)
     // }
-
-  }, [])
+  // }, [])
 
   // useEffect(() => {
   //   setTimeout(function() {
@@ -170,45 +169,7 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
 
   return (
     <>
-      <Box sx={{ position: 'absolute', top: 20, right: 20 }}>
-        <Flex
-          sx={{
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: 4,
-          }}
-        >
-          <Box>
-            <Box sx={{ ...sx.label, mt: [0] }}>Filter layer</Box>
-            <Toggle
-              sx={{ float: 'right', mt: [2] }}
-              value={showFilter}
-              onClick={() => setShowFilter((prev) => !prev)}
-            />
-          </Box>
-        </Flex>
-      </Box>
-
-      <Box sx={{ position: 'absolute', top: 80, right: 20 }}>
-        <Flex
-          sx={{
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: 4,
-          }}
-        >
-          <Box>
-            <Box sx={{ ...sx.label, mt: [0] }}>Temp layer</Box>
-            <Toggle
-              sx={{ float: 'right', mt: [2] }}
-              value={showTemp}
-              onClick={() => setShowTemp((prev) => !prev)}
-            />
-          </Box>
-        </Flex>
-      </Box>
-
-      <Box sx={{ position: 'absolute', top: 140, right: 5 }}>
+      <Box sx={{ position: 'absolute', top: 20, right: 5 }}>
         <Search />
       </Box>
 
@@ -309,6 +270,20 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
         >
           {clim[1].toFixed(1)}
         </Badge>
+
+        <Box sx={{ ...sx.label, mt: [2] }}>Filter layer</Box>
+        <Toggle
+          sx={{ mt: [2] }}
+          value={showFilter}
+          onClick={() => setShowFilter((prev) => !prev)}
+        />
+
+      <Box sx={{ ...sx.label, mt: [2] }}>Temp layer</Box>
+      <Toggle
+        sx={{ mt: [2] }}
+        value={showTemp}
+        onClick={() => setShowTemp((prev) => !prev)}
+      />
 
       </Box>
     </>
