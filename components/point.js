@@ -82,7 +82,6 @@ const Point = ({ source, variable, color, id, label = false, labelText = null, m
           },
           layout: {
             'text-ignore-placement': false,
-            // 'text-font': ['relative-faux-book'],
             'text-font': ['Metropolis Regular'],
             'text-field': ['format', ['get', labelText], { 'font-scale': 1.0 }],
           },

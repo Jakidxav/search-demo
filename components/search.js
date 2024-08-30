@@ -9,7 +9,7 @@ import SearchBoxCoords from './search-box-coords'
 import SearchResults from './search-results'
 import SearchResultsMapbox from './search-results-mapbox'
 
-const Search = () => {
+const Search = ({ lookup, setLookup, place, setPlace }) => {
   const { theme } = useThemeUI()
 
   const [results, setResults] = useState([])
@@ -97,7 +97,7 @@ const Search = () => {
     if (coordinates) {
       map.flyTo({
         center: coordinates,
-        zoom: 7.5,
+        zoom: 8.5,
       })
     }
   }, [coordinates])
@@ -139,6 +139,10 @@ const Search = () => {
               setSearchText={setSearchText}
               setCoordinates={setCoordinates}
               setBbox={setBbox}
+              lookup={lookup}
+              setLookup={setLookup}
+              place={place}
+              setPlace={setPlace}
             />
           </>
         )}

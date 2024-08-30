@@ -11,12 +11,14 @@ const SearchResults = ({
     searchText,
     setSearchText,
     setCoordinates,
-    setBbox
+    setBbox,
+    lookup,
+    setLookup,
+    place, 
+    setPlace
 }) => {
 
     const { theme } = useThemeUI()
-    const [place, setPlace] = useState(null)
-    const [lookup, setLookup] = useState(null)
 
     const sx = {
         'search-results': {
@@ -101,11 +103,11 @@ const SearchResults = ({
                                 }}>
                                     {
                                         result[1] == 'cities' ? 'city' :
-                                        result[1] == 'counties' ? 'county' :
-                                        result[1] == 'states' ? 'state' :
-                                        result[1] == 'countries' ? 'country' :
-                                        result[1] == 'regions' ? 'region' :
-                                        'lake'
+                                            result[1] == 'counties' ? 'county' :
+                                                result[1] == 'states' ? 'state' :
+                                                    result[1] == 'countries' ? 'country' :
+                                                        result[1] == 'regions' ? 'region' :
+                                                            'lake'
                                     }
                                 </Text>
                             </Box>

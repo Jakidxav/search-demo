@@ -52,7 +52,7 @@ const DEFAULT_COLORMAPS = {
   warm_nights: 'fire',
 }
 
-const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTemp, setShowTemp }) => {
+const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTemp, setShowTemp, lookup, setLookup, place, setPlace }) => {
   const {
     clim,
     variable,
@@ -170,7 +170,12 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
   return (
     <>
       <Box sx={{ position: 'absolute', top: 20, right: 5 }}>
-        <Search />
+        <Search 
+          lookup={lookup} 
+          setLookup={setLookup}
+          place={place} 
+          setPlace={setPlace}
+        />
       </Box>
 
       <Box sx={{ position: 'absolute', top: 20, left: 20 }}>

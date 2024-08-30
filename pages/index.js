@@ -10,7 +10,7 @@ import Point from '../components/point'
 import LineMinZoom from '../components/line-min-zoom'
 import FillMinZoom from '../components/fill-min-zoom'
 import FilterLayer from '../components/filter-layer'
-import TempLayer from '../components/temp-layer'
+// import TempLayer from '../components/temp-layer'
 import ParameterControls from '../components/parameter-controls'
 
 const bucket = 'https://carbonplan-maps.s3.us-west-2.amazonaws.com/'
@@ -37,6 +37,9 @@ const Index = () => {
   const [regionData, setRegionData] = useState({ loading: true })
   const [showFilter, setShowFilter] = useState(false)
   const [showTemp, setShowTemp] = useState(false)
+
+  const [lookup, setLookup] = useState(null)
+  const [place, setPlace] = useState(null)
 
   const glyphs = "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf"
 
@@ -87,6 +90,14 @@ const Index = () => {
     console.log(map)
   }
 
+  // useEffect(() => {
+  //   if(lookup) {
+  //     console.log(lookup)
+  //   }
+  // }, [lookup])
+
+  const filterSource = 'https://storage.googleapis.com/risk-maps/search/'
+
   return (
     <Box sx={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} >
       <Map style={{ width: '100%', height: '100%', }} ref={container} zoom={zoom} glyphs={glyphs} >
@@ -97,21 +108,21 @@ const Index = () => {
           variable={'land'}
         />
 
-        <Fill
+        {/* <Fill
           id='land-fill'
           color={theme.rawColors.primary}
           source={bucket + 'basemaps/land'}
           variable={'land'}
           opacity={0.0}
           onMouseEnter={handleEnter}
-        />
+        /> */}
 
         <LineMinZoom
           id={'lakes-outline'}
           color={theme.rawColors.primary}
           source={'https://storage.googleapis.com/risk-maps/search/lakes'}
           variable={'lakes'}
-          minZoom={4}
+          minZoom={2}
           width={1.5}
           label={true}
           labelText={'NAME'}
@@ -122,7 +133,7 @@ const Index = () => {
           color={theme.rawColors.background}
           source={'https://storage.googleapis.com/risk-maps/search/lakes'}
           variable={'lakes'}
-          minZoom={4}
+          minZoom={2}
           width={1.5}
           label={true}
           labelText={'NAME'}
@@ -135,11 +146,11 @@ const Index = () => {
           variable={'states'}
           minZoom={4}
           width={1.5}
-        label={true}
-        labelText={'NAME'}
+          label={true}
+          labelText={'NAME'}
         />
 
-      <LineMinZoom
+        {/* <LineMinZoom
           id={'counties'}
           color={theme.rawColors.primary}
           source={'https://storage.googleapis.com/risk-maps/search/counties'}
@@ -148,7 +159,7 @@ const Index = () => {
           width={1.5}
           label={true}
           labelText={'NAME'}
-        />
+        /> */}
 
         {/* <Box sx={{
             width: '300px',
@@ -165,7 +176,8 @@ const Index = () => {
             animationFillMode: 'forwards',
         }}>
         </Box> */}
-        {showTemp && (
+
+        {/* {showTemp && (
           <TempLayer
             id={'temp-layer'}
             variable={'states'}
@@ -173,22 +185,7 @@ const Index = () => {
             width={5}
             opacity={0}
           />
-        )}
-
-        {showFilter && (
-          <FilterLayer
-            id={'states2'}
-            source={'https://storage.googleapis.com/risk-maps/search/states'}
-            variable={'states'}
-            // minZoom={4}
-            width={4}
-            opacity={0}
-            color={'black'}
-            label={true}
-            labelText={'NAME'}
-            filter={null}
-          />
-        )}
+        )} */}
 
         <Point
           id={'populated-places'}
@@ -200,14 +197,30 @@ const Index = () => {
           labelText={'NAMEASCII'}
         />
 
-        <Point
+        {/* <Point
           id={'airports'}
           color={theme.rawColors.primary}
           source={'https://storage.googleapis.com/risk-maps/search/airports'}
           variable={'airports'}
           label={true}
           labelText={'NAME'}
-        />
+        /> */}
+
+        {showFilter && lookup != null && (
+          <FilterLayer
+            id={place}
+            source={filterSource + (lookup == 'cities' ? 'pop_places' : lookup)}
+            variable={lookup == 'cities' ? 'pop_places' : lookup}
+            // minZoom={4}
+            opacity={0}
+            color={theme.rawColors.primary}
+            label={true}
+            labelText={'NAME'}
+            filter={null}
+            type={lookup == 'cities' ? 'circle' : 'line'}
+            place={place}
+          />
+        )}
 
         <Raster
           id='raster'
@@ -228,6 +241,10 @@ const Index = () => {
           setShowFilter={setShowFilter}
           showTemp={showTemp}
           setShowTemp={setShowTemp}
+          lookup={lookup}
+          setLookup={setLookup}
+          place={place}
+          setPlace={setPlace}
         />
 
         <Dimmer
