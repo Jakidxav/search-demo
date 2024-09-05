@@ -65,7 +65,7 @@ const SearchResults = ({
             fetch(`https://storage.googleapis.com/risk-maps/search/${lookup}.geojson`)
                 .then((response) => response.json())
                 .then((json) => {
-                    let filtered = json.features.filter(feature => feature.properties.NAME == searchText)[0];
+                    let filtered = json.features.filter(feature => feature.properties.name == searchText)[0];
                     if (filtered.geometry != null && filtered.geometry.type == 'Point') {
                         let coords = filtered.geometry.coordinates
                         // console.log(coords)

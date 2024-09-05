@@ -27,10 +27,8 @@ const FilterLayer = ({
 
   const sourceIdRef = useRef()
   const layerIdRef = useRef()
+  const textIdRef = useRef()
 
-  console.log(source)
-  console.log(place)
-  console.log(place.split(/[ ,]+/))
   let opacityProperty = type == 'line' ? 'line-opacity' : 'circle-opacity'
   let colorProperty = type == 'line' ? 'line-color' : 'circle-color'
   let widthProperty = type == 'line' ? 'line-width' : 'circle-radius'
@@ -57,113 +55,69 @@ const FilterLayer = ({
   }, [id])
 
   useEffect(() => {
+    const { current: sourceId } = sourceIdRef
+
     const layerId = layerIdRef.current || uuidv4()
     layerIdRef.current = layerId
-    console.log(layerId)
-    const { current: sourceId } = sourceIdRef
+    
+    textIdRef.current = uuidv4()
+    const { current: textId } = textIdRef
+
     if (!map.getLayer(layerId)) {
       let tempLayer
-      if (type == 'circle') {
-        let split = place.split(/[ ,]+/)
-        let city = split[0]
-        let state = split[1]
-        tempLayer = map.addLayer({
-          id: layerId,
-          type: 'circle',
-          source: sourceId,
-          'source-layer': variable,
-          layout: { visibility: 'visible' },
-          paint: {
-            'circle-color': color,
-            'circle-opacity': opacity,
-            'circle-radius': 4,
-            'circle-stroke-color': color,
-            'circle-stroke-width': 4,
-            'circle-stroke-opacity': opacity,
-
-          },
-          // 'filter': {['==', 'NAMEASCII', 'Seattle']}
-          "filter": ["all",
-            ["==", "NAMEASCII", city],
-            // ["in", "ADM1NAME", 'WA']
-          ]
-        })
-      } else {
-        console.log("I should be adding the line layer to the map!")
-        tempLayer = map.addLayer({
-          id: layerId,
-          type: 'line',
-          source: sourceId,
-          'source-layer': variable,
-          layout: { visibility: 'visible' },
-          paint: {
-            'line-blur': 0.4,
-            'line-color': color,
-            'line-opacity': opacity,
-            'line-width': width * 2,
-          },
-          'filter': ['in', 'name', 'Washington'] 
-          // for states, the filter is this ^^
-          // for counties, the filter is: ['in', 'NAME', '...'] 
-          // I also need to look to see whether I can set this effect to run on map idle
-          // https://docs.mapbox.com/mapbox-gl-js/api/map/#map#idle
-        })
-      }
+      tempLayer = map.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        'source-layer': variable,
+        layout: { visibility: 'visible' },
+        paint: {
+          'line-blur': 0.4,
+          'line-color': color,
+          'line-opacity': opacity,
+          'line-width': width * 2,
+        },
+        'filter': ['==', 'name', place]
+      })
     }
 
-    if(type == 'circle') {
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'circle-opacity', 0)
-        map.setPaintProperty(layerId, 'circle-stroke-opacity', 0)
-      }, 750)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'circle-opacity', 1);
-        map.setPaintProperty(layerId, 'circle-stroke-opacity', 1)
-      }, 1000)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'circle-opacity', 0)
-        map.setPaintProperty(layerId, 'circle-stroke-opacity', 0)
-      }, 1250)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'circle-opacity', 1);
-        map.setPaintProperty(layerId, 'circle-stroke-opacity', 1)
-      }, 1500)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'circle-opacity', 0)
-        map.setPaintProperty(layerId, 'circle-stroke-opacity', 0)
-      }, 1750)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'circle-opacity', 1);
-        map.setPaintProperty(layerId, 'circle-stroke-opacity', 1)
-      }, 2000)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'circle-opacity', 0);
-        map.setPaintProperty(layerId, 'circle-stroke-opacity', 0)
-      }, 2250)
-    } else {
-      console.log("Should be styling the line!")
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'line-opacity', 0)
-      }, 750)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'line-opacity', 1);
-      }, 1000)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'line-opacity', 0)
-      }, 1250)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'line-opacity', 1);
-      }, 1500)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'line-opacity', 0)
-      }, 1750)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'line-opacity', 1);
-      }, 2000)
-      setTimeout(function () {
-        map.setPaintProperty(layerId, 'line-opacity', 0);
-      }, 2250)
-    }
+
+    // if (label) {
+    //   if (!map.style.stylesheet.glyphs) {
+    //     console.log("Please specify a glyphs object in the <Map /> component in order to use text labels.")
+    //     return
+    //   }
+
+    //   if (!map.getLayer(textId)) {
+    //     map.addLayer({
+    //       id: textId,
+    //       type: 'symbol',
+    //       source: sourceId,
+    //       'source-layer': variable,
+    //       paint: {
+    //         'text-color': color,
+    //         'text-opacity': 1.0,
+    //         'text-translate': [0, 0],
+    //       },
+    //       layout: {
+    //         'text-ignore-placement': false,
+    //         'text-font': ['Metropolis Regular'],
+    //         'text-field': ['format', ['get', labelText], { 'font-scale': 1.0 }],
+    //       },
+    //       'filter': ['==', 'name', place],
+    //     //   'filter': [ "any", 
+    //     //   ["any", [ ">=", "$zoom", 0 ], [ ">=", "pop_max", 1500000 ] ],
+    //     //   [ "any", [ ">=", "$zoom", 4 ], [ ">=", "pop_max", 1000000 ] ],
+    //     //   [ "any", [ ">=", "$zoom", 6 ], [ ">=", "pop_max", 0 ] ],
+    //     // ]
+    //     })
+    //   }
+    // }
+
+    setTimeout(function () {
+      map.setPaintProperty(layerId, 'line-opacity', 1);
+      // map.setPaintProperty(textId, 'text-opacity', 1);
+    }, 1)
 
     return () => {
       if (!removed.current) {

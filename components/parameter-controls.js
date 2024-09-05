@@ -202,8 +202,7 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
         THIS IS THE PART THAT WILL BE DIFFICULT TO CUSTOMIZE
         I NEED TO THINK MORE ABOUT HOW TO DO THIS WITHOUT NEEDING TO WRITE EXCEPTIONS FOR EVERY VARIABLE 
         */}
-        <Box sx={sx.label}>Warming level / time period</Box>
-        {/* {(variable != 'slr') && ( */}
+        {/* <Box sx={sx.label}>Warming level / time period</Box>
         {(variable != 'slr_3d') && (
           <Slider
             min={VARIABLE_BANDS[variable][0]}
@@ -224,7 +223,6 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
             top: [1],
           }}
         >
-          {/* { (variable == 'slr') ? '2050' : (variable == 'tc_rp') ? band : band.toFixed(1) } */}
           {(variable == 'slr_3d') || (variable == 'tc_rp') ? band.toFixed(0) : band.toFixed(1)}
         </Badge>
 
@@ -274,7 +272,7 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
           }}
         >
           {clim[1].toFixed(1)}
-        </Badge>
+        </Badge> */}
 
         <Box sx={{ ...sx.label, mt: [2] }}>Filter layer</Box>
         <Toggle

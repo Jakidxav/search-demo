@@ -58,6 +58,12 @@ const Point = ({ source, variable, color, id, label = false, labelText = null, m
           'circle-opacity': 0.7,
           'circle-radius': 4,
         },
+        // 'filter': ['>=', 'pop_max', 1000000] 
+      //   'filter': [ "any", 
+      //               ["any", [ ">=", "$zoom", 0 ], [ ">=", "pop_max", 1500000 ] ],
+      //               [ "any", [ ">=", "$zoom", 4 ], [ ">=", "pop_max", 1000000 ] ],
+      //               [ "any", [ ">=", "$zoom", 6 ], [ ">=", "pop_max", 0 ] ],
+      //             ]
       })
     }
 
@@ -85,6 +91,11 @@ const Point = ({ source, variable, color, id, label = false, labelText = null, m
             'text-font': ['Metropolis Regular'],
             'text-field': ['format', ['get', labelText], { 'font-scale': 1.0 }],
           },
+        //   'filter': [ "any", 
+        //   ["any", [ ">=", "$zoom", 0 ], [ ">=", "pop_max", 1500000 ] ],
+        //   [ "any", [ ">=", "$zoom", 4 ], [ ">=", "pop_max", 1000000 ] ],
+        //   [ "any", [ ">=", "$zoom", 6 ], [ ">=", "pop_max", 0 ] ],
+        // ]
         })
       }
 

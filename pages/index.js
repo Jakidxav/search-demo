@@ -8,9 +8,9 @@ import { useThemedColormap } from '@carbonplan/colormaps'
 import { Map, Raster, Fill, Line } from '@carbonplan/maps'
 import Point from '../components/point'
 import LineMinZoom from '../components/line-min-zoom'
+import LineMaxZoom from '../components/line-max-zoom'
 import FillMinZoom from '../components/fill-min-zoom'
 import FilterLayer from '../components/filter-layer'
-// import TempLayer from '../components/temp-layer'
 import ParameterControls from '../components/parameter-controls'
 
 const bucket = 'https://carbonplan-maps.s3.us-west-2.amazonaws.com/'
@@ -35,7 +35,7 @@ const Index = () => {
 
   const [showRegionPicker, setShowRegionPicker] = useState(false)
   const [regionData, setRegionData] = useState({ loading: true })
-  const [showFilter, setShowFilter] = useState(false)
+  const [showFilter, setShowFilter] = useState(true)
   const [showTemp, setShowTemp] = useState(false)
 
   const [lookup, setLookup] = useState(null)
@@ -86,36 +86,18 @@ const Index = () => {
     setColormapName,
   }
 
-  const handleEnter = () => {
-    console.log(map)
-  }
-
-  // useEffect(() => {
-  //   if(lookup) {
-  //     console.log(lookup)
-  //   }
-  // }, [lookup])
-
   const filterSource = 'https://storage.googleapis.com/risk-maps/search/'
 
   return (
     <Box sx={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} >
       <Map style={{ width: '100%', height: '100%', }} ref={container} zoom={zoom} glyphs={glyphs} >
-        <Line
+        <LineMaxZoom
           id={'land-outline'}
           color={theme.rawColors.primary}
-          source={bucket + 'basemaps/land'}
+          source={'https://storage.googleapis.com/risk-maps/vector_layers/land'}
           variable={'land'}
+          maxZoom={2.5}
         />
-
-        {/* <Fill
-          id='land-fill'
-          color={theme.rawColors.primary}
-          source={bucket + 'basemaps/land'}
-          variable={'land'}
-          opacity={0.0}
-          onMouseEnter={handleEnter}
-        /> */}
 
         <LineMinZoom
           id={'lakes-outline'}
@@ -125,7 +107,7 @@ const Index = () => {
           minZoom={2}
           width={1.5}
           label={true}
-          labelText={'NAME'}
+          labelText={'name'}
         />
 
         <FillMinZoom
@@ -136,7 +118,29 @@ const Index = () => {
           minZoom={2}
           width={1.5}
           label={true}
-          labelText={'NAME'}
+          labelText={'name'}
+        />
+
+      <LineMinZoom
+          id={'countries'}
+          color={theme.rawColors.primary}
+          source={'https://storage.googleapis.com/risk-maps/search/countries'}
+          variable={'countries'}
+          minZoom={2}
+          width={1.5}
+          label={true}
+          labelText={'name'}
+        />
+
+      <LineMinZoom
+          id={'regions'}
+          color={theme.rawColors.primary}
+          source={'https://storage.googleapis.com/risk-maps/search/regions'}
+          variable={'regions'}
+          minZoom={2}
+          width={1.5}
+          label={true}
+          labelText={'name'}
         />
 
         <LineMinZoom
@@ -147,7 +151,7 @@ const Index = () => {
           minZoom={4}
           width={1.5}
           label={true}
-          labelText={'NAME'}
+          labelText={'name'}
         />
 
         {/* <LineMinZoom
@@ -155,10 +159,10 @@ const Index = () => {
           color={theme.rawColors.primary}
           source={'https://storage.googleapis.com/risk-maps/search/counties'}
           variable={'counties'}
-          minZoom={4}
+          minZoom={6}
           width={1.5}
           label={true}
-          labelText={'NAME'}
+          labelText={'name'}
         /> */}
 
         {/* <Box sx={{
@@ -188,36 +192,28 @@ const Index = () => {
         )} */}
 
         <Point
-          id={'populated-places'}
+          id={'cities'}
           color={theme.rawColors.primary}
-          // source={'https://storage.googleapis.com/risk-maps/search/pop_places.geojson'}
-          source={'https://storage.googleapis.com/risk-maps/search/pop_places'}
-          variable={'pop_places'}
+          source={'https://storage.googleapis.com/risk-maps/search/cities'}
+          variable={'cities'}
           label={true}
-          labelText={'NAMEASCII'}
+          labelText={'name'}
+          minZoom={6}
         />
 
-        {/* <Point
-          id={'airports'}
-          color={theme.rawColors.primary}
-          source={'https://storage.googleapis.com/risk-maps/search/airports'}
-          variable={'airports'}
-          label={true}
-          labelText={'NAME'}
-        /> */}
-
-        {showFilter && lookup != null && (
+        {showFilter && lookup == 'counties' && (
           <FilterLayer
-            id={place}
-            source={filterSource + (lookup == 'cities' ? 'pop_places' : lookup)}
-            variable={lookup == 'cities' ? 'pop_places' : lookup}
-            // minZoom={4}
+            key={place}
+            id={'counties'}
+            source={filterSource + lookup}
+            variable={lookup}
+            minZoom={4}
             opacity={0}
             color={theme.rawColors.primary}
             label={true}
-            labelText={'NAME'}
+            labelText={'name'}
             filter={null}
-            type={lookup == 'cities' ? 'circle' : 'line'}
+            type={'line'}
             place={place}
           />
         )}
