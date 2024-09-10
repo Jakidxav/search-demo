@@ -281,12 +281,12 @@ const ParameterControls = ({ getters, setters, showFilter, setShowFilter, showTe
           onClick={() => setShowFilter((prev) => !prev)}
         />
 
-      <Box sx={{ ...sx.label, mt: [2] }}>Temp layer</Box>
+      {/* <Box sx={{ ...sx.label, mt: [2] }}>Temp layer</Box>
       <Toggle
         sx={{ mt: [2] }}
         value={showTemp}
         onClick={() => setShowTemp((prev) => !prev)}
-      />
+      /> */}
 
       </Box>
     </>
