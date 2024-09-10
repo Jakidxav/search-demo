@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { keyframes } from '@emotion/react'
-import { Box, useThemeUI } from 'theme-ui'
+import { Box, useColorMode, useThemeUI } from 'theme-ui'
 import mapboxgl from 'mapbox-gl'
 import { Dimmer } from '@carbonplan/components'
 import { useThemedColormap } from '@carbonplan/colormaps'
@@ -16,10 +16,13 @@ import ParameterControls from '../components/parameter-controls'
 const bucket = 'https://carbonplan-maps.s3.us-west-2.amazonaws.com/'
 
 const Index = () => {
+  const { theme } = useThemeUI()
+  const [colorMode, setColorMode] = useColorMode()
+  
   const container = useRef(null)
   const [map, setMap] = useState(null)
   const [ready, setReady] = useState(null)
-  const { theme } = useThemeUI()
+
   const [clim, setClim] = useState([0.0, 0.5])
   const [variable, setVariable] = useState("drought")
   const [colormapName, setColormapName] = useState('warm')
@@ -70,6 +73,10 @@ const Index = () => {
       setReady(null)
       mapContainer.remove()
     }
+  }, [])
+
+  useEffect(() => {
+    setColorMode('light')
   }, [])
 
   const getters = {
