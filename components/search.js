@@ -120,7 +120,7 @@ const Search = ({ lookup, setLookup, place, setPlace }) => {
         >
           <option value='place'>Place</option>
           <option value='coords'>Coordinates</option>
-          <option value='mapbox'>Mapbox</option>
+          {/* <option value='mapbox'>Mapbox</option> */}
           {/* <option value='pelias'>Pelias</option> */}
         </Select>
 

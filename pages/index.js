@@ -18,7 +18,7 @@ const bucket = 'https://carbonplan-maps.s3.us-west-2.amazonaws.com/'
 const Index = () => {
   const { theme } = useThemeUI()
   const [colorMode, setColorMode] = useColorMode()
-  
+
   const container = useRef(null)
   const [map, setMap] = useState(null)
   const [ready, setReady] = useState(null)
@@ -44,7 +44,7 @@ const Index = () => {
   const [lookup, setLookup] = useState(null)
   const [place, setPlace] = useState(null)
 
-  const glyphs = "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf"
+  const glyphs = "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf"
 
   const fade = keyframes({
     from: {
